@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bert Caers — Game Developer & 3D Artist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0c0e;
+  --surface:#141416;
+  --surface2:#1c1c20;
+  --border:#2a2a30;
+  --text:#f0f0f2;
+  --muted:#888896;
+  --accent:#7c6fff;
+  --accent2:#4fd1c5;
+  --font:'Space Grotesk',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;min-height:100vh;overflow-x:hidden}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(12,12,14,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px}
+.nav-logo{font-size:1.1rem;font-weight:600;letter-spacing:-.02em;color:var(--text);cursor:pointer}
+.nav-logo span{color:var(--accent)}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.875rem;cursor:pointer;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+
+.page{display:none}
+.page.active{display:block}
+
+.hero{min-height:90vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 2rem;position:relative;overflow:hidden}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;opacity:.35;pointer-events:none}
+.hero-glow{position:absolute;top:20%;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(ellipse,rgba(124,111,255,.12) 0%,transparent 70%);pointer-events:none}
+.hero-eyebrow{font-size:.75rem;font-weight:500;letter-spacing:.15em;color:var(--accent);text-transform:uppercase;margin-bottom:1.25rem}
+.hero h1{font-size:clamp(2.8rem,7vw,5.5rem);font-weight:600;line-height:1.05;letter-spacing:-.03em;margin-bottom:1rem}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero-sub{font-size:1.1rem;color:var(--muted);max-width:480px;margin:0 auto 2.5rem;font-weight:300;line-height:1.7}
+.hero-tags{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-bottom:2.5rem}
+.tag{background:var(--surface2);border:1px solid var(--border);padding:.3rem .85rem;border-radius:100px;font-size:.8rem;color:var(--muted)}
+.hero-cta{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.5rem;border-radius:8px;font-family:var(--font);font-size:.875rem;font-weight:500;cursor:pointer;text-decoration:none;transition:all .2s;border:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#9080ff;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--muted);background:var(--surface2)}
+
+section{padding:5rem 2rem;max-width:1100px;margin:0 auto}
+.section-label{font-size:.7rem;font-weight:500;letter-spacing:.15em;color:var(--accent);text-transform:uppercase;margin-bottom:.75rem}
+.section-title{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:600;letter-spacing:-.02em;margin-bottom:.5rem}
+.section-sub{color:var(--muted);font-size:.95rem;max-width:800px;margin-bottom:3rem;font-weight:300}
+.divider{width:100%;height:1px;background:var(--border);max-width:1100px;margin:0 auto}
+
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.25rem}
+.cat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:border-color .25s,transform .25s;position:relative}
+.cat-card:hover{border-color:var(--accent);transform:translateY(-4px)}
+.cat-card-thumb{width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.cat-card-thumb img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.thumb-emoji{position:relative;z-index:1;font-size:3rem;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+.cat-card-body{padding:1.25rem}
+.cat-card-title{font-size:1.05rem;font-weight:600;margin-bottom:.3rem}
+.cat-card-desc{font-size:.82rem;color:var(--muted);line-height:1.5}
+.cat-card-arrow{position:absolute;bottom:1.1rem;right:1.1rem;color:var(--accent);font-size:1.1rem;opacity:0;transition:opacity .2s,transform .2s}
+.cat-card:hover .cat-card-arrow{opacity:1;transform:translateX(3px)}
+
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+.about-text p{color:var(--muted);font-size:.95rem;line-height:1.8;margin-bottom:1rem;font-weight:300}
+.skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.skill-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem}
+.skill-label{font-size:.8rem;color:var(--muted);margin-bottom:.4rem}
+.skill-bar{height:3px;background:var(--border);border-radius:100px;overflow:hidden}
+.skill-fill{height:100%;border-radius:100px;background:var(--accent)}
+
+.contact-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2.5rem;display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap}
+.contact-links{display:flex;gap:1rem;flex-wrap:wrap}
+.contact-link{display:inline-flex;align-items:center;gap:.5rem;background:var(--surface2);border:1px solid var(--border);color:var(--text);text-decoration:none;padding:.6rem 1.1rem;border-radius:8px;font-size:.85rem;transition:all .2s}
+.contact-link:hover{border-color:var(--accent);color:var(--accent)}
+
+footer{border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--muted)}
+
+/* SUBPAGES */
+.subpage{display:none;min-height:100vh}
+.subpage.active{display:block}
+.subpage-hero{padding:4rem 2rem 2rem;max-width:1100px;margin:0 auto}
+.back-btn{display:inline-flex;align-items:center;gap:.4rem;color:var(--muted);font-size:.85rem;cursor:pointer;border:none;background:none;font-family:var(--font);padding:0;margin-bottom:2rem;transition:color .2s}
+.back-btn:hover{color:var(--text)}
+.subpage-eyebrow{font-size:.7rem;font-weight:500;letter-spacing:.15em;color:var(--accent);text-transform:uppercase;margin-bottom:.6rem}
+.subpage-title{font-size:clamp(2rem,5vw,3.5rem);font-weight:600;letter-spacing:-.03em;margin-bottom:1rem}
+.subpage-desc{font-size:1rem;color:var(--muted);max-width:700px;line-height:1.8;font-weight:300}
+
+/* MASONRY GALLERY */
+.gallery-section{padding:0 2rem 3rem;max-width:1100px;margin:0 auto}
+.gallery-section-label{font-size:.7rem;font-weight:500;letter-spacing:.15em;color:var(--accent);text-transform:uppercase;margin-bottom:1.25rem;margin-top:2.5rem;display:block}
+.masonry{columns:2;column-gap:10px}
+@media(max-width:700px){.masonry{columns:2}}
+@media(max-width:420px){.masonry{columns:1}}
+.masonry-item{break-inside:avoid;margin-bottom:10px;border-radius:8px;overflow:hidden;cursor:pointer;border:1px solid var(--border);transition:opacity .2s,border-color .2s;display:block}
+.masonry-item:hover{opacity:.85;border-color:var(--accent)}
+.masonry-item img{width:100%;height:auto;display:block}
+
+/* VIDEO */
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1rem}
+.video-item{border-radius:10px;overflow:hidden;background:var(--surface);border:1px solid var(--border)}
+.video-item iframe{width:100%;aspect-ratio:16/9;display:block;border:none}
+.video-item video{width:100%;aspect-ratio:16/9;display:block;object-fit:cover;background:#000}
+.video-caption{padding:.6rem .85rem;font-size:.78rem;color:var(--muted)}
+
+/* LIGHTBOX */
+.lightbox{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.93);align-items:center;justify-content:center}
+.lightbox.open{display:flex}
+.lightbox img{max-width:90vw;max-height:88vh;border-radius:8px;object-fit:contain}
+.lightbox-close{position:absolute;top:1.25rem;right:1.5rem;font-size:1.75rem;color:var(--muted);cursor:pointer;background:none;border:none;font-family:var(--font);line-height:1}
+.lightbox-close:hover{color:var(--text)}
+
+.center-container{display:flex;flex-direction:column;gap:15px;align-items:center;margin:2rem 0}
+.center-container img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo" onclick="showHome()">Bert<span>.</span></span>
+  <ul class="nav-links">
+    <li><a onclick="showHome();scrollToId('work')">Work</a></li>
+    <li><a onclick="showHome();scrollToId('about')">About</a></li>
+    <li><a onclick="showHome();scrollToId('contact')">Contact</a></li>
+  </ul>
+</nav>
+
+<div id="page-home" class="page active">
+
+  <div class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <p class="hero-eyebrow">Game Developer & 3D Artist</p>
+    <h1>Bert <em>Caers</em></h1>
+    <div class="hero-tags">
+      <span class="tag">Unreal Engine</span>
+      <span class="tag">Unity</span>
+      <span class="tag">Blender</span>
+      <span class="tag">3D Graphics</span>
+      <span class="tag">Animation</span>
+      <span class="tag">Game Design</span>
+    </div>
+    <div class="hero-cta">
+      <a href="#work" class="btn btn-primary">View my work</a>
+      <a href="#contact" class="btn btn-outline">Get in touch</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <section id="work">
+    <p class="section-label">Portfolio</p>
+    <h2 class="section-title">My Work</h2>
+    <p class="section-sub">Click a category to explore. No generative AI was used in anything you see.</p>
+    <div class="cat-grid">
+
+      <div class="cat-card" onclick="showSubpage('game-dev')">
+        <div class="cat-card-thumb">
+          <img src="images/Miner1.png" class="cat-thumb-img">
+        </div>
+        <div class="cat-card-body">
+          <p class="cat-card-title">Game Development</p>
+          <p class="cat-card-desc">Games, prototypes, and interactive experiences built in Unreal Engine and Unity.</p>
+        </div>
+        <span class="cat-card-arrow">→</span>
+      </div>
+
+      <div class="cat-card" onclick="showSubpage('3d-art')">
+        <div class="cat-card-thumb">
+          <img src="images/3Dart15.png" class="cat-thumb-img">
+        </div>
+        <div class="cat-card-body">
+          <p class="cat-card-title">3D Art</p>
+          <p class="cat-card-desc">Models, characters, sculptures and hard-surface assets for games and animation.</p>
+        </div>
+        <span class="cat-card-arrow">→</span>
+      </div>
+
+      <div class="cat-card" onclick="showSubpage('3d-animation')">
+        <div class="cat-card-thumb">
+          <img src="images/3DAnimGif10.gif" class="cat-thumb-img">
+        </div>
+        <div class="cat-card-body">
+          <p class="cat-card-title">3D Animation</p>
+          <p class="cat-card-desc">Character animation, rigging, and motion graphics for games and cinematic sequences.</p>
+        </div>
+        <span class="cat-card-arrow">→</span>
+      </div>
+
+      <div class="cat-card" onclick="showSubpage('2d')">
+        <div class="cat-card-thumb">
+          <img src="images/2D3.png" class="cat-thumb-img">
+        </div>
+        <div class="cat-card-body">
+          <p class="cat-card-title">2D</p>
+          <p class="cat-card-desc">Some drawings and 2D animations</p>
+        </div>
+        <span class="cat-card-arrow">→</span>
+      </div>
+
+      <div class="cat-card" onclick="showSubpage('the-burden')">
+        <div class="cat-card-thumb">
+          <img src="images/TheBurden_Still8.png" class="cat-thumb-img">
+        </div>
+        <div class="cat-card-body">
+          <p class="cat-card-title">The Burden — 3D Animated Short</p>
+          <p class="cat-card-desc">An original 3D animated short film</p>
+        </div>
+        <span class="cat-card-arrow">→</span>
+      </div>
+
+      <div class="cat-card" onclick="showSubpage('wahoo')">
+        <div class="cat-card-thumb">
+          <img src="images/Wahoo1.png" class="cat-thumb-img">
+        </div>
+        <div class="cat-card-body">
+          <p class="cat-card-title">Wahoo Internship</p>
+          <p class="cat-card-desc">Work produced during internship at Wahoo — 3D assets, animations, and production work.</p>
+        </div>
+        <span class="cat-card-arrow">→</span>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="about">
+    <p class="section-label">About</p>
+    <h2 class="section-title">Profile</h2>
+    <div class="about-grid">
+      <div class="about-text">
+        <p> I graduated in 2025 with a Master's degree in Animation from LUCA School of Arts in Genk. Since the beginning of my animation studies, I have developed a strong passion for the versatile 3D software, Blender. Over the past 6 years, I have used this program daily for both 3D and 2D animation (including modeling, rigging, texturing, and more), as well as sculpting, visual effects (VFX), and compositing. I’ve explored nearly every aspect of Blender, pushing my boundaries to the point where I can work creatively with many of its features and techniques without limitations. </p>
+
+        <p>I’m also constantly playing and creating video games. That is why I started a game development course. I have now refined my skills inside Unreal Engine and learned about all the different aspects of the game development process.</p>
+        <p>I'm currently looking for opportunities in game studios where I can contribute across both art and tech disciplines.</p>
+        <a href="mailto:bertcaersanim@gmail.com" class="btn btn-outline" style="margin-top:.5rem">Get in touch →</a>
+      </div>
+      <div>
+        <div class="skills-grid">
+          <div class="skill-item"><p class="skill-label">Unreal Engine</p><div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div></div>
+          <div class="skill-item"><p class="skill-label">Unity</p><div class="skill-bar"><div class="skill-fill" style="width:70%"></div></div></div>
+          <div class="skill-item"><p class="skill-label">Blender</p><div class="skill-bar"><div class="skill-fill" style="width:100%"></div></div></div>
+          <div class="skill-item"><p class="skill-label">Substance Painter</p><div class="skill-bar"><div class="skill-fill" style="width:75%"></div></div></div>
+          <div class="skill-item"><p class="skill-label">Adobe Première Pro</p><div class="skill-bar"><div class="skill-fill" style="width:80%"></div></div></div>
+          <div class="skill-item"><p class="skill-label">Adobe After Effects</p><div class="skill-bar"><div class="skill-fill" style="width:65%"></div></div></div>
+          <div class="skill-item"><p class="skill-label">Adobe Photoshop</p><div class="skill-bar"><div class="skill-fill" style="width:78%"></div></div></div>
+          <div class="skill-item"><p class="skill-label">Adobe Illustrator</p><div class="skill-bar"><div class="skill-fill" style="width:68%"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="contact">
+    <p class="section-label">Contact</p>
+    <h2 class="section-title">Contact Info</h2>
+    <p class="section-sub">Open to full-time roles, freelance projects, and collaborations.</p>
+    <div class="contact-card">
+      <div>
+        <p style="font-size:1.1rem;font-weight:500;margin-bottom:.25rem">Bert Caers</p>
+        <p style="color:var(--muted);font-size:.875rem">Game Developer · 3D Artist · Belgium</p>
+      </div>
+      <div class="contact-links">
+        <a href="mailto:bertcaersanim@gmail.com" class="contact-link">✉ Email</a>
+        <a href="https://www.instagram.com/83rt_c/" class="contact-link" target="_blank">📸 Instagram</a>
+        <a href="https://www.linkedin.com/in/bert-caers-1895b4373/" class="contact-link" target="_blank">💼 LinkedIn</a>
+      </div>
+    </div>
+  </section>
+
+  <footer><p>© 2026 Bert Caers — Game Developer & 3D Artist · Belgium</p></footer>
+
+</div><div id="subpage-game-dev" class="subpage">
+  <div class="subpage-hero">
+    <button class="back-btn" onclick="showHome()">← Back to work</button>
+    <p class="subpage-eyebrow">Category</p>
+    <h1 class="subpage-title">Game Development</h1>
+    <p class="subpage-desc">A collection of games, prototypes and interactive experiences I've built using Unreal Engine 5, Unity and Blender.</p>
+  </div>
+
+  <!-- GAME 1 -->
+  <div class="subpage-hero">
+    <p class="subpage-eyebrow">Project 01</p>
+    <h2 class="subpage-title" style="font-size: 2rem; margin-top: 0.5rem;">Startegic turn-based fighter game</h2>
+    <p class="subpage-desc">This is a local multiplayer, turn-based fighting game set in a medieval arena. I made this game for my final game development exam. 
+Unlike traditional turn-based games, both players choose their strategic moves via card-based mechanics while time is frozen, and then execute those actions simultaneously from a top-down perspective.
+I made this game in Unreal Engine 5 and created all the 3D assets and character rigs using Blender.</p>
+  </div>
+
+  <div class="gallery-section">
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/TBFG1.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TBFG2.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TBFG3.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TBFG4.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TBFG5.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TBFG6.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TBFGGif1.gif" onclick="openLightbox(this.src)"></div>
+      <div class="video-item">
+        <iframe src="https://www.youtube.com/embed/v7aFYggdDt8" allowfullscreen title="3D art video"></iframe>
+        <p class="video-caption">Startegic turn-based fighter game</p>
+      </div>
+    </div>
+  </div>
+
+
+  <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 4rem 0;">
+
+  <!-- GAME 2 -->
+  <div class="subpage-hero">
+    <p class="subpage-eyebrow">Project 02</p>
+    <h2 class="subpage-title" style="font-size: 2rem; margin-top: 0.5rem;">Cozy retro-style 3D modelling game</h2>
+    <p class="subpage-desc">This is a prototype of a game where you need to create 3D models using only your keyboard. Every keyboard press has a specific function that modifies the primitive shapes. You can also record key presses which means every 3D model you make can be encoded into a series of keypresses. When you play the recording back, it recreates your model in the exactly the same way.</p>
+  </div>
+
+  <div class="gallery-section">
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/Modeller1.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/Modeller2.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/Modeller3.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/ModellerGif1.gif" onclick="openLightbox(this.src)"></div>
+      <div class="video-item">
+        <iframe src="https://www.youtube.com/embed/MEnEch-OhTY" allowfullscreen title="3D art video"></iframe>
+        <p class="video-caption">Cozy Retro-style 3D modelling game</p>
+      </div>
+
+    </div>
+  </div>
+
+  <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 4rem 0;">
+
+  <!-- GAME 3 -->
+  <div class="subpage-hero">
+    <p class="subpage-eyebrow">Project 03</p>
+    <h2 class="subpage-title" style="font-size: 2rem; margin-top: 0.5rem;">Mining Game</h2>
+    <p class="subpage-desc">This is a first-person prototype game I made in Unreal Engine where you have to mine all sorts of ores to feed them to waves of hungry golems.</p>
+  </div>
+
+  <div class="gallery-section">
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/Miner1.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/MinerGif1.gif" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/MinerGif2.gif" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/MinerGif3.gif" onclick="openLightbox(this.src)"></div>
+      <div class="video-item">
+        <iframe src="https://www.youtube.com/embed/Fepne4rhqS0" allowfullscreen title="3D art video"></iframe>
+        <p class="video-caption">Mining Game</p>
+      </div>
+    </div>
+  </div>
+  <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 4rem 0;">
+
+  <!-- GAME 4 -->
+  <div class="subpage-hero">
+    <p class="subpage-eyebrow">Project 04</p>
+    <h2 class="subpage-title" style="font-size: 2rem; margin-top: 0.5rem;">Coin Flippa</h2>
+    <p class="subpage-desc">I also made a small mobile game where you flip a coin and try to guess the outcome correctly as many times in a row as possible</p>
+  </div>
+
+  <div class="gallery-section">
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/Coin1.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/Coin2.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/Coin3.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/Coin4.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/CoinGif1.gif" onclick="openLightbox(this.src)"></div>
+      <div class="video-item">
+        <iframe src="https://www.youtube.com/embed/dKOyEFOVwgw" allowfullscreen title="3D art video"></iframe>
+        <p class="video-caption">Coin Flippa</p>
+      </div>
+    </div>
+  </div>
+  <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 4rem 0;">
+
+  <!-- GAME 5 -->
+  <div class="subpage-hero">
+    <p class="subpage-eyebrow">Project 05</p>
+    <h2 class="subpage-title" style="font-size: 2rem; margin-top: 0.5rem;">Chicken Stock</h2>
+    <p class="subpage-desc">This is a prototype of a game where a chicken jumps through platforms while its height determines the value of a stock. You can strategically buy and sell stocks to make a profit.</p>
+  </div>
+
+  <div class="gallery-section">
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/ChickenStock1.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/ChickenStockGif1.gif" onclick="openLightbox(this.src)"></div>
+      <div class="video-item">
+        <iframe src="https://www.youtube.com/embed/8VEtezndLCU" allowfullscreen title="3D art video"></iframe>
+        <p class="video-caption">Chicken Stock</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- GAME 6 -->
+  <div class="subpage-hero">
+    <p class="subpage-eyebrow">Project 06</p>
+    <h2 class="subpage-title" style="font-size: 2rem; margin-top: 0.5rem;">Cell Management Game</h2>
+    <p class="subpage-desc">This is another prototype game where you work under a microscope to feed and multiply cells. There is a small chance for a cell to become cancerous, and it is your job to interfere before it spreads. </p>
+  </div>
+
+  <div class="gallery-section">
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/CellGif1.gif" onclick="openLightbox(this.src)"></div>
+    </div>
+  </div>
+
+
+  <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 4rem 0;">
+
+  <!-- GAME 7 -->
+  <div class="subpage-hero">
+    <p class="subpage-eyebrow">Project 07</p>
+    <h2 class="subpage-title" style="font-size: 2rem; margin-top: 0.5rem;">Fruit Merger Game</h2>
+    <p class="subpage-desc">In this game you try to stack and merge fruits as efficiently as possible as to not make the basket overflow.</p>
+  </div>
+
+  <div class="gallery-section">
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/Fruit1.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/FruitGif1.gif" onclick="openLightbox(this.src)"></div>
+
+    </div>
+  </div>
+</div>
+
+  </div>
+  <footer><p>© 2026 Bert Caers · <span style="cursor:pointer;color:var(--accent)" onclick="showHome()">Back to portfolio</span></p></footer>
+</div>
+
+
+<div id="subpage-3d-art" class="subpage">
+  <div class="subpage-hero">
+    <button class="back-btn" onclick="showHome()">← Back to work</button>
+    <p class="subpage-eyebrow">Category</p>
+    <h1 class="subpage-title">3D Art</h1>
+    <p class="subpage-desc">Models, characters and hard-surface assets created for games and film. All works were made using Blender and Substance Painter.</p>
+  </div>
+  <div class="gallery-section">
+
+    <span class="gallery-section-label">Images</span>
+    <img src="images/3Dart1.png" alt="Featured 3D Artwork" style="width: 100%; max-width: 1100px; height: auto; display: block; margin-bottom: 15px; border-radius: 8px;">
+
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/3DartGif1.gif" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DartGif2.gif" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart4.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart5.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart8.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart3.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart9.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DartGif3.gif" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DartGif4.gif" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart6.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart7.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+    </div>
+
+    <div class="center-container">
+      <img src="images/3Dart10.png" width="1030" alt="3D artwork detail">
+      <img src="images/3Dart11.png" width="1030" alt="3D artwork detail">
+      <img src="images/3Dart12.png" width="1030" alt="3D artwork detail">
+    </div>
+
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/3Dart13.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart14.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DartGif5.gif" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DartGif7.gif" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DartGif6.gif" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart15.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart16.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart17.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart18.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart19.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+    </div>
+
+    <span class="gallery-section-label">Sculpting</span>
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/3Dart20.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart21.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart22.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3Dart23.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DartGif8.gif" alt="3D art" onclick="openLightbox(this.src)"></div>
+    </div>
+
+    <span class="gallery-section-label">Commissioned Work</span>
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/White.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/Blue.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/Purple.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/Gold.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/Dark.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/Sakura.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/AncientCoin.png" alt="3D art" onclick="openLightbox(this.src)"></div>
+    </div>
+
+  </div>
+  <footer><p>© 2026 Bert Caers · <span style="cursor:pointer;color:var(--accent)" onclick="showHome()">Back to portfolio</span></p></footer>
+</div>
+
+
+<div id="subpage-3d-animation" class="subpage">
+  <div class="subpage-hero">
+    <button class="back-btn" onclick="showHome()">← Back to work</button>
+    <p class="subpage-eyebrow">Category</p>
+    <h1 class="subpage-title">3D Animation</h1>
+    <p class="subpage-desc">Character animation, rigging, and motion graphics for games and cinematic sequences.</p>
+  </div>
+  <div class="gallery-section">
+
+    <span class="gallery-section-label">Bachelor Project</span>
+    <p class="subpage-desc" style="margin-bottom: 2rem;">My bachelor animation project was originally developed as a foundation for my master thesis, exploring a postapocalyptic world where a small robot and a mystical forest spirit both search for sunlight. Although I later changed the concept for my master project, shifting to a different 3D animated short with a new storyline, the thematic core remained consistent. Both works use allegorical characters to reflect on the relationship between humanity and nature—represented in the bachelor film by the robot and the forest spirit, respectively.​​​​​​​</p>
+
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/3DanimGif1.gif" alt="Animation still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DanimGif2.gif" alt="Animation still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DanimGif3.gif" alt="Animation still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DanimGif9.gif" alt="Animation still" onclick="openLightbox(this.src)"></div>
+    </div>
+    <div class="video-grid" style="margin-top: 15px; margin-bottom: 30px;">
+      <div class="video-item">
+        <iframe src="https://www.youtube.com/embed/ssAFPBpFZXw" allowfullscreen title="Animation video 1"></iframe>
+        <p class="video-caption">Bachelor Project</p>
+      </div>
+    </div>
+
+    <span class="gallery-section-label">3D Motion Graphics</span>
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/3DanimGif4.gif" alt="Animation still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DanimGif5.gif" alt="Animation still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DanimGif6.gif" alt="Animation still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DanimGif7.gif" alt="Animation still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DanimGif8.gif" alt="Animation still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DanimGif14.gif" alt="Animation still" onclick="openLightbox(this.src)"></div>
+      <div class="video-item">
+        <iframe src="https://www.youtube.com/embed/tnFcaK0sRFM" allowfullscreen title="Animation video 2"></iframe>
+        <p class="video-caption">Landscape Generator</p>
+      </div>
+      <div class="video-item">
+        <iframe src="https://www.youtube.com/embed/cVbfack5BAE" allowfullscreen title="Animation video 3"></iframe>
+        <p class="video-caption">Golem VFX exercise</p>
+      </div>
+    </div>
+
+    <span class="gallery-section-label">Character Animation</span>
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/3DanimGif10.gif" alt="Animation still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DanimGif11.gif" alt="Animation still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DanimGif12.gif" alt="Animation still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DanimGif15.gif" alt="Animation still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/3DanimGif16.gif" alt="Animation still" onclick="openLightbox(this.src)"></div>
+      <div class="video-item">
+        <iframe src="https://www.youtube.com/embed/2akMr33hb0w" allowfullscreen title="Animation video 5"></iframe>
+        <p class="video-caption">Minotaur Animation</p>
+      </div>
+      <div class="video-item">
+        <iframe src="https://www.youtube.com/embed/jgR-1FK2Mrc" allowfullscreen title="Animation video 6"></iframe>
+        <p class="video-caption">Prisoner Animation</p>
+      </div>
+    </div>
+
+
+    <span class="gallery-section-label">Sub - Animated Short</span>
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/SubThumbnail.png" alt="Animation still" onclick="openLightbox(this.src)"></div>
+    </div>
+    
+    <div class="video-grid" style="margin-top: 15px;">
+      <div class="video-item">
+        <iframe src="https://www.youtube.com/embed/_WqjQ9Iwpw8" allowfullscreen title="Animation video 7"></iframe>
+        <p class="video-caption">Sub - Animated Short</p>
+      </div>
+    </div>
+
+  </div>
+  <footer><p>© 2026 Bert Caers · <span style="cursor:pointer;color:var(--accent)" onclick="showHome()">Back to portfolio</span></p></footer>
+</div>
+
+
+<div id="subpage-2d" class="subpage">
+  <div class="subpage-hero">
+    <button class="back-btn" onclick="showHome()">← Back to work</button>
+    <p class="subpage-eyebrow">Category</p>
+    <h1 class="subpage-title">2D</h1>
+    <p class="subpage-desc">Some of my drawings and 2D animations.</p>
+  </div>
+  <div class="gallery-section">
+
+
+    <span class="gallery-section-label">2D Animations</span>
+    <div class="video-grid">
+      <div class="video-item">
+        <iframe src="https://www.youtube.com/embed/98LxrppLrQU" allowfullscreen title="2D video"></iframe>
+        <p class="video-caption">Eyeball Animation</p>
+      </div>
+      <div class="video-item">
+        <iframe src="https://www.youtube.com/embed/bl3tvgsN6_I" allowfullscreen title="2D video"></iframe>
+        <p class="video-caption">Zombiemaze.exe</p>
+      </div>
+      <div class="video-item">
+        <iframe src="https://www.youtube.com/embed/EknvRdnyIYg" allowfullscreen title="2D video"></iframe>
+        <p class="video-caption">Goblin Walkcycle</p>
+      </div>
+    </div>
+
+    <span class="gallery-section-label">Drawings</span>
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/2D1.png" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/2DJPEG1.jpg" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/2DJPEG2.jpg" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/2DJPEG3.jpg" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/2DJPEG4.jpg" onclick="openLightbox(this.src)"></div>
+    </div>
+
+  </div>
+  <footer><p>© 2026 Bert Caers · <span style="cursor:pointer;color:var(--accent)" onclick="showHome()">Back to portfolio</span></p></footer>
+</div>
+
+
+<div id="subpage-the-burden" class="subpage">
+  <div class="subpage-hero">
+    <button class="back-btn" onclick="showHome()">← Back to work</button>
+    <p class="subpage-eyebrow">3D Animated Short Film</p>
+    <h1 class="subpage-title">The Burden</h1>
+    <p class="subpage-desc">I made The Burden for my animation master thesis. It is a 3D animated short film about a greedy man in the desert who builds a settlement on the back of a giant tortoise. The story serves as an allegory for humanity’s indifference to its destructive impact on nature. Where the old man represents humanity and the tortoise symbolizes nature.</p>
+
+    <p class="subpage-eyebrow" style="margin-top: 1.5rem">Synopsis</p>
+
+    <p class="subpage-desc">In a desolate, endless desert, a giant turtle struggles with a heavy burden on her back. The burden is a growing pile of metal waste, accumulated by an old, greedy man who lives on her shell. Using a magnet and a fishing rod, he scavenges for anything that seems valuable, while steering the turtle with a chain.
+Tensions between the man and the turtle rise as the heap of junk grows and the turtle becomes exhausted. Blinded by his obsession to collect more, the man ignores the signs of the animal’s deterioration.
+As they travel through a massive junkyard, the man seizes the opportunity to expand his settlement. The pile of waste on the turtle’s back quickly transforms into a towering structure.
+Eventually, the burden becomes too heavy for the turtle, and the tower collapses violently. The man is buried under the rubble, while the turtle retreats into her shell to protect herself.
+At sunset, the turtle emerges from her shell and continues on her own path.
+    </p>
+  </div>
+  <div class="gallery-section">
+
+    <span class="gallery-section-label">Film</span>
+    <div class="video-grid">
+      <div class="video-item" style="grid-column:1/-1">
+        <iframe src="https://www.youtube.com/embed/zwEca8vTLxQ" allowfullscreen title="The Burden — Full Short Film"></iframe>
+        <p class="video-caption">The Burden — Full Short Film</p>
+      </div>
+    </div>
+
+    <span class="gallery-section-label">Stills & Behind the Scenes</span>
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/TheBurdenPoster.png" alt="The Burden Poster" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TheBurden_Still1.png" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TheBurden_Still2.png" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TheBurden_Still3.png" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/Pile.png" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TheBurden_Still4.png" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TheBurden_Still5.png" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TheBurden_Still6.png" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/ChainGif.gif" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TheBurden_Still7.png" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TheBurden_Still8.png" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TheBurden_Still9.png" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TheBurden_Still10.png" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TheBurden_Still11.png" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/TheBurden_Still12.png" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/RunningGif.gif" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/FishingRodGif.gif" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/CharacterSheetMan.png" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/CharacterSheetTurtle.png" alt="The Burden still" onclick="openLightbox(this.src)"></div>
+    </div>
+
+  </div>
+  <footer><p>© 2026 Bert Caers · <span style="cursor:pointer;color:var(--accent)" onclick="showHome()">Back to portfolio</span></p></footer>
+</div>
+
+
+<div id="subpage-wahoo" class="subpage">
+  <div class="subpage-hero">
+    <button class="back-btn" onclick="showHome()">← Back to work</button>
+    <p class="subpage-eyebrow">Internship</p>
+    <h1 class="subpage-title">Wahoo Internship</h1>
+    <p class="subpage-desc">In the summer of 2024 I did an internship at Waooh in Liège. I was part of the 3D team that worked on the animated short film called CTRL-ALT-CHAOS. I was tasked with modelling and animating 3D assets, based on concept art, and exporting them to Unreal Engine. Check out their website at www.waooh.be</p>
+  </div>
+  <div class="gallery-section">
+
+    <span class="gallery-section-label">Images</span>
+    <div class="masonry">
+      <div class="masonry-item"><img src="images/wahoo1.png" alt="Wahoo work" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/wahoo2.png" alt="Wahoo work" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/wahoo3.png" alt="Wahoo work" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/wahoo4.png" alt="Wahoo work" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/wahoo5.png" alt="Wahoo work" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/wahoo6.png" alt="Wahoo work" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/wahoo7.png" alt="Wahoo work" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/wahoo8.png" alt="Wahoo work" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/wahooGif1.gif" alt="Wahoo work" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/wahooGif2.gif" alt="Wahoo work" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/wahooGif3.gif" alt="Wahoo work" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/wahooGif4.gif" alt="Wahoo work" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/wahooGif5.gif" alt="Wahoo work" onclick="openLightbox(this.src)"></div>
+      <div class="masonry-item"><img src="images/wahooGif6.gif" alt="Wahoo work" onclick="openLightbox(this.src)"></div>
+    </div>
+
+  </div>
+  <footer><p>© 2026 Bert Caers · <span style="cursor:pointer;color:var(--accent)" onclick="showHome()">Back to portfolio</span></p></footer>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightbox-img" src="" alt="Enlarged view"/>
+</div>
+
+<script>
+function showHome(){
+  document.querySelectorAll('.page,.subpage').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-home').classList.add('active');
+  window.scrollTo(0,0);
+}
+function showSubpage(id){
+  document.querySelectorAll('.page,.subpage').forEach(el=>el.classList.remove('active'));
+  document.getElementById('subpage-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function scrollToId(id){
+  setTimeout(()=>{
+    const el=document.getElementById(id);
+    if(el) el.scrollIntoView({behavior:'smooth'});
+  },50);
+}
+function openLightbox(src){
+  document.getElementById('lightbox-img').src=src;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape') closeLightbox();});
+</script>
+</body>
+</html>
